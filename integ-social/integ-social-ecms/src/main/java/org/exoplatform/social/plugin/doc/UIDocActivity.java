@@ -83,7 +83,6 @@ public class UIDocActivity extends BaseUIActivity {
   private static final String IMAGE_PREFIX = "image/";
   private static final String DOCUMENT_POSTFIX = "/pdf";
   
-  public static final String ACTIVITY_TYPE = "DOC_ACTIVITY";
   public static final String DOCLINK = "DOCLINK";
   public static final String MESSAGE = "MESSAGE";
   public static final String REPOSITORY = "REPOSITORY";
@@ -165,7 +164,9 @@ public class UIDocActivity extends BaseUIActivity {
         return rootVersion_.getChildren().size();
       }
     } catch (Exception e) {
-        LOG.info("cannot version node");
+        if(LOG.isDebugEnabled()) {
+          LOG.debug("cannot version node", e);
+        }
     }
     return 0;
   }
@@ -203,7 +204,7 @@ public class UIDocActivity extends BaseUIActivity {
         uiApplication.addMessage(new ApplicationMessage("UIDocActivity.msg.noPermission", null, ApplicationMessage.WARNING));
         return;
       }
-      final UIActivitiesContainer activitiesContainer = docActivity.getParent();
+      final UIActivitiesContainer activitiesContainer = docActivity.getAncestorOfType(UIActivitiesContainer.class);
       final PopupContainer popupContainer = activitiesContainer.getPopupContainer();
 
       if (docActivity.getChild(UIDocViewer.class) != null) {
@@ -255,7 +256,6 @@ public class UIDocActivity extends BaseUIActivity {
   /**
    * Gets the webdav url.
    * 
-   * @param node the node
    * @return the webdav url
    * @throws Exception the exception
    */
@@ -290,7 +290,6 @@ public class UIDocActivity extends BaseUIActivity {
   /**
    * Gets the summary.
    * 
-   * @param node the node
    * @return the summary of Node. Return empty string if catch an exception.
    */
   public String getSummary() {
@@ -364,7 +363,7 @@ public class UIDocActivity extends BaseUIActivity {
   /**
    * Generate the Thumbnail Image URI.
    * 
-   * @param node the node
+   * @param file the node
    * @return the Thumbnail uri with medium size
    * @throws Exception the exception
    */
@@ -399,7 +398,7 @@ public class UIDocActivity extends BaseUIActivity {
   /**
    * Generate the viewer link to site explorer by node
    * 
-   * @param Node the node
+   * @param node the node
    * @return String the viewer link
    * @throws RepositoryException
    */
