@@ -19,11 +19,14 @@ package org.exoplatform.forum.ext.common;
 import java.util.List;
 import java.util.Map;
 
-import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.forum.common.CommonUtils;
 import org.exoplatform.forum.common.user.CommonContact;
 import org.exoplatform.forum.common.user.ContactProvider;
+import org.exoplatform.forum.common.user.DefaultContactProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.model.Profile;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
@@ -31,10 +34,8 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.service.LinkProvider;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Vu Duy Tu
- *          tu.duy@exoplatform.com
- * Sep 28, 2011
+ * Created by The eXo Platform SAS Author : Vu Duy Tu tu.duy@exoplatform.com Sep
+ * 28, 2011
  */
 public class SocialContactProvider implements ContactProvider {
 
@@ -44,10 +45,17 @@ public class SocialContactProvider implements ContactProvider {
   @Override
   public CommonContact getCommonContact(String userId) {
     
+    OrganizationService orgService = (OrganizationService) ExoContainerContext.getCurrentContainer()
+                                                                              .getComponentInstanceOfType(OrganizationService.class);
+    CommonContact defaultContact = new DefaultContactProvider(orgService).getCommonContact(userId);
+    
     CommonContact contact = null;
-    IdentityManager identityM = CommonsUtils.getService(IdentityManager.class);
+    IdentityManager identityM = (IdentityManager) ExoContainerContext.getCurrentContainer()
+                                                                     .getComponentInstanceOfType(IdentityManager.class);
     if (identityM != null) {
-      Identity userIdentity = identityM.getOrCreateIdentity(OrganizationIdentityProvider.NAME, userId, true);
+      Identity userIdentity = identityM.getOrCreateIdentity(OrganizationIdentityProvider.NAME,
+                                                            userId,
+                                                            true);
       if (userIdentity != null) {
         contact = new CommonContact();
         Profile profile = userIdentity.getProfile();
@@ -84,11 +92,22 @@ public class SocialContactProvider implements ContactProvider {
         } else {
           contact.setWebSite(LinkProvider.getProfileUri(userId));
         }
+        if (CommonUtils.isEmpty(contact.getBirthday()))
+          contact.setBirthday(defaultContact.getBirthday());
+        if (CommonUtils.isEmpty(contact.getCountry()))
+          contact.setCountry(defaultContact.getCountry());
+        if (CommonUtils.isEmpty(contact.getCity()))
+          contact.setCity(defaultContact.getCity());
+        if (CommonUtils.isEmpty(contact.getHomePhone()))
+          contact.setHomePhone(defaultContact.getHomePhone());
+        if (CommonUtils.isEmpty(contact.getWorkPhone()))
+          contact.setWorkPhone(defaultContact.getWorkPhone());
       }
     }
     if (contact == null) {
-      LOG.warn(String.format("Could not retrieve forum user profile for %s by SocialContactProvider.", userId));
-      return new CommonContact();
+      LOG.warn(String.format("Could not retrieve forum user profile for %s by SocialContactProvider, DefaultContactProvider will be used.",
+                             userId));
+      return defaultContact;
     }
     return contact;
   }

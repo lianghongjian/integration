@@ -392,7 +392,8 @@
               def systemCommentTitle ;
               StringBuffer commentBuffer = new StringBuffer();
               if (systemComment!=null) {
-                  systemCommentTitle = uicomponent.getSystemCommentTitle(activityParams);
+                systemCommentTitle = uicomponent.getSystemCommentTitle(activityParams);
+                if (systemComment!=null) {
                   if (systemComment.length>0) {
                     for (def count=0; count<systemComment.length; count++) {
                       commentMessage = _ctx.appRes(systemComment[count]);
@@ -413,11 +414,13 @@
                     }
                   }
                   commentMessage = commentBuffer.toString(); 
+                }else {
+                  commentMessage = it.title;
+                }
               } else {
                 commentMessage = it.title;
-                commentMessage = ContentReader.simpleEscapeHtml(commentMessage);
               }
-
+              commentMessage = ContentReader.simpleEscapeHtml(commentMessage);
               commentPostedTime = uicomponent.getPostedTimeString(_ctx, it.postedTime);
               commenterAvatarImgSrc = commentId.profile.avatarUrl;
               if (!commenterAvatarImgSrc) commenterAvatarImgSrc = LinkProvider.PROFILE_DEFAULT_AVATAR_URL;

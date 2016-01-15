@@ -366,8 +366,12 @@ public class WikiSpaceActivityPublisher extends PageWikiListener {
     if(pagePermissions != null) {
       for(PermissionEntry permissionEntry : pagePermissions) {
         if(permissionEntry.getIdType().equals(IDType.MEMBERSHIP) && permissionEntry.getId().equals(groupMemberShip)) {
+          for(Permission permission : permissionEntry.getPermissions()) {
+            if(PermissionType.VIEWPAGE.toString().equals(permission.getPermissionType())) {
               isPublic = true;
               break;
+            }
+          }
         }
       }
     }
