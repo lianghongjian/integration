@@ -139,7 +139,7 @@
 			<SharedADocument>分享文档</SharedADocument>
 			<NoSpace>请选择至少一个共享空间</NoSpace>
 			<option>
-				<read>可以查看/read>
+				<read>可以查看</read>
 				<modify>可以编辑</modify>
 			</option>
 		</label>
